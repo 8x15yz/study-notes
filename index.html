@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Study Notes</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f5ef;
+      --surface: #ffffff;
+      --ink: #202124;
+      --muted: #686b70;
+      --line: #d9d7cf;
+      --accent: #1864ab;
+      --accent-soft: #e7f1fb;
+      --shadow: 0 16px 48px rgba(32, 33, 36, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.64);
+      padding: 28px 22px;
+    }
+
+    main {
+      padding: 38px min(6vw, 72px);
+    }
+
+    .brand {
+      margin-bottom: 28px;
+    }
+
+    .brand h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .brand p,
+    .empty,
+    .meta {
+      color: var(--muted);
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .note-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .note-link {
+      display: block;
+      min-height: 58px;
+      padding: 12px 14px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 140ms ease, border-color 140ms ease;
+    }
+
+    .note-link:hover,
+    .note-link:focus,
+    .note-link.active {
+      border-color: #b7d4ef;
+      background: var(--accent-soft);
+      outline: none;
+    }
+
+    .note-title {
+      display: block;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .note-date {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .viewer {
+      max-width: 900px;
+      min-height: calc(100vh - 76px);
+      margin: 0 auto;
+      padding: clamp(22px, 4vw, 48px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin-bottom: 24px;
+      font-size: 0.92rem;
+    }
+
+    .raw-link {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .raw-link:hover,
+    .raw-link:focus {
+      text-decoration: underline;
+    }
+
+    #content h1,
+    #content h2,
+    #content h3 {
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    #content h1 {
+      margin: 0 0 24px;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+    }
+
+    #content h2 {
+      margin: 36px 0 14px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-size: 1.45rem;
+    }
+
+    #content h3 {
+      margin: 26px 0 10px;
+      font-size: 1.15rem;
+    }
+
+    #content p,
+    #content ul,
+    #content ol,
+    #content pre,
+    #content blockquote {
+      margin: 0 0 16px;
+    }
+
+    #content ul,
+    #content ol {
+      padding-left: 1.35rem;
+    }
+
+    #content code {
+      border-radius: 5px;
+      background: #eef0f3;
+      padding: 0.15em 0.35em;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    #content pre {
+      overflow-x: auto;
+      border-radius: 8px;
+      background: #202124;
+      color: #f7f7f7;
+      padding: 16px;
+    }
+
+    #content pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    #content blockquote {
+      border-left: 4px solid var(--accent);
+      padding: 4px 0 4px 16px;
+      color: var(--muted);
+    }
+
+    #content hr {
+      height: 1px;
+      margin: 30px 0;
+      border: 0;
+      background: var(--line);
+    }
+
+    .empty {
+      display: grid;
+      min-height: 55vh;
+      place-items: center;
+      text-align: center;
+    }
+
+    .empty h2 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 1.5rem;
+    }
+
+    .empty p {
+      margin: 0;
+    }
+
+    @media (max-width: 780px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: static;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      main {
+        padding: 18px;
+      }
+
+      .viewer {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <h1>Study Notes</h1>
+        <p>GitHub Pages용 Markdown 노트 모음</p>
+      </div>
+      <nav aria-label="노트 목록">
+        <ul class="note-list" id="noteList"></ul>
+      </nav>
+    </aside>
+
+    <main>
+      <article class="viewer">
+        <div class="meta" id="meta" hidden></div>
+        <section id="content" class="empty">
+          <div>
+            <h2>노트를 선택하세요</h2>
+            <p>왼쪽 목록에서 Markdown 파일을 클릭하면 여기에서 바로 볼 수 있습니다.</p>
+          </div>
+        </section>
+      </article>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const notes = [
+      {
+        title: "MQTT 브로커 개념 정리",
+        date: "2026-06-02",
+        file: "2026 06 02 mqtt 브로커.md"
+      },
+      {
+        title: "MQTT와 IoT 보안 정리",
+        date: "2026-06-05",
+        file: "2026 06 05 mqtt iot보안.md"
+      },
+      {
+        title: "GCP 무료티어 + Cloudflare Tunnel 개념 정리",
+        date: "2026-06-08",
+        file: "2026 06 08 gcp cloudflare터널 개념정리.md"
+      }
+    ];
+
+    const noteList = document.querySelector("#noteList");
+    const content = document.querySelector("#content");
+    const meta = document.querySelector("#meta");
+
+    function noteUrl(file) {
+      return encodeURI(file);
+    }
+
+    function renderList() {
+      noteList.innerHTML = notes.map((note) => `
+        <li>
+          <a class="note-link" href="?note=${encodeURIComponent(note.file)}" data-file="${note.file}">
+            <span class="note-title">${note.title}</span>
+            <span class="note-date">${note.date}</span>
+          </a>
+        </li>
+      `).join("");
+    }
+
+    async function loadNote(file) {
+      const note = notes.find((item) => item.file === file) || notes[0];
+      const response = await fetch(noteUrl(note.file));
+
+      if (!response.ok) {
+        throw new Error(`${note.file} 파일을 불러오지 못했습니다.`);
+      }
+
+      const markdown = await response.text();
+      const renderer = window.marked?.parse
+        ? window.marked.parse(markdown)
+        : `<pre>${markdown.replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#39;"
+          })[char])}</pre>`;
+
+      document.title = `${note.title} | Study Notes`;
+      meta.hidden = false;
+      meta.innerHTML = `
+        <span>${note.date}</span>
+        <a class="raw-link" href="${noteUrl(note.file)}" target="_blank" rel="noreferrer">원문 열기</a>
+      `;
+      content.classList.remove("empty");
+      content.innerHTML = renderer;
+
+      document.querySelectorAll(".note-link").forEach((link) => {
+        link.classList.toggle("active", link.dataset.file === note.file);
+      });
+    }
+
+    renderList();
+
+    noteList.addEventListener("click", (event) => {
+      const link = event.target.closest(".note-link");
+      if (!link) return;
+
+      event.preventDefault();
+      const file = link.dataset.file;
+      history.pushState({ file }, "", `?note=${encodeURIComponent(file)}`);
+      loadNote(file).catch(showError);
+    });
+
+    window.addEventListener("popstate", () => {
+      const file = new URLSearchParams(location.search).get("note");
+      if (file) loadNote(file).catch(showError);
+    });
+
+    function showError(error) {
+      meta.hidden = true;
+      content.classList.add("empty");
+      content.innerHTML = `
+        <div>
+          <h2>파일을 열 수 없습니다</h2>
+          <p>${error.message}</p>
+        </div>
+      `;
+    }
+
+    const initialFile = new URLSearchParams(location.search).get("note");
+    if (initialFile) {
+      loadNote(initialFile).catch(showError);
+    }
+  </script>
+</body>
+</html>
