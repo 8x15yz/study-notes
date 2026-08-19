@@ -3,78 +3,212 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>Study Notes</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f7f5ef;
+      --sidebar-w: 284px;
+      --topbar-h: 52px;
+      --page-max: 1180px;
+      --article-max: 860px;
+      --prose-max: 760px;
+
+      --bg: #f5f5f3;
       --surface: #ffffff;
+      --surface-2: #fafaf9;
+      --surface-3: #f1f1ef;
       --ink: #202124;
-      --muted: #686b70;
-      --line: #d9d7cf;
-      --accent: #1864ab;
-      --accent-soft: #e7f1fb;
-      --shadow: 0 16px 48px rgba(32, 33, 36, 0.08);
+      --ink-soft: #43464b;
+      --muted: #73767c;
+      --faint: #9a9da2;
+      --line: #dededb;
+      --line-strong: #c9c9c5;
+      --accent: #4f5bd5;
+      --accent-ink: #3843b8;
+      --accent-soft: #f0f1ff;
+      --code-bg: #181a20;
+      --code-head: #20232a;
+      --code-ink: #eef0f5;
+      --success-soft: #eff8f2;
+      --success-line: #80b990;
+      --warn-soft: #fff8e8;
+      --warn-line: #d5a338;
+      --info-soft: #eef6fb;
+      --info-line: #6aa8ca;
+      --danger-soft: #fff1f0;
+      --danger-line: #df8178;
+      --shadow-soft: 0 1px 0 rgba(0,0,0,.06);
+      --radius-sm: 5px;
+      --radius: 8px;
+      --radius-lg: 12px;
     }
 
-    * {
-      box-sizing: border-box;
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #171819;
+      --surface: #1d1f21;
+      --surface-2: #222426;
+      --surface-3: #2a2c2f;
+      --ink: #f1f2f3;
+      --ink-soft: #d5d7da;
+      --muted: #9ea2a8;
+      --faint: #797e85;
+      --line: #34373a;
+      --line-strong: #494d52;
+      --accent: #a7adff;
+      --accent-ink: #c3c7ff;
+      --accent-soft: #2a2d49;
+      --code-bg: #121317;
+      --code-head: #191b20;
+      --code-ink: #eff1f4;
+      --success-soft: #1f3025;
+      --success-line: #5f9970;
+      --warn-soft: #342d1d;
+      --warn-line: #b58b35;
+      --info-soft: #1e2d36;
+      --info-line: #5f98b6;
+      --danger-soft: #382422;
+      --danger-line: #bd6f68;
+      --shadow-soft: 0 1px 0 rgba(0,0,0,.8);
     }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       min-height: 100vh;
       background: var(--bg);
       color: var(--ink);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.65;
+      font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      font-size: 15px;
+      line-height: 1.68;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    a {
-      color: inherit;
-    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    ::selection { background: var(--accent-soft); }
 
-    .layout {
+    .app {
       display: grid;
-      grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+      grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
       min-height: 100vh;
     }
 
-    aside {
+    /* ---------- left library ---------- */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
       border-right: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.64);
-      padding: 28px 22px;
+      background: var(--surface-2);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
     }
 
-    main {
-      padding: 38px min(6vw, 72px);
+    .side-head {
+      flex: 0 0 auto;
+      padding: 20px 18px 14px;
     }
 
-    .brand {
-      margin-bottom: 28px;
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
-    .brand h1 {
-      margin: 0 0 6px;
-      font-size: clamp(1.5rem, 2vw, 2rem);
-      line-height: 1.2;
-      letter-spacing: 0;
+    .brand-mark {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+      font: 700 13px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
     }
 
-    .brand p,
-    .empty,
-    .meta {
-      color: var(--muted);
-    }
-
-    .brand p {
+    .brand-copy { min-width: 0; }
+    .brand-copy h1 {
       margin: 0;
-      font-size: 0.95rem;
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    .brand-copy p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .search-wrap { position: relative; }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      width: 14px;
+      height: 14px;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .search {
+      width: 100%;
+      height: 34px;
+      padding: 0 30px 0 32px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      outline: none;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 12px;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .search::placeholder { color: var(--faint); }
+    .search:focus {
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-soft) 80%, transparent);
+    }
+
+    .note-nav {
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 4px 10px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    .note-nav:hover { scrollbar-color: var(--line-strong) transparent; }
+
+    .nav-group { margin-top: 16px; }
+    .nav-group:first-child { margin-top: 4px; }
+    .nav-label {
+      padding: 0 8px 6px;
+      color: var(--faint);
+      font-size: 10px;
+      line-height: 1.4;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
     }
 
     .note-list {
       display: grid;
-      gap: 10px;
+      gap: 2px;
       margin: 0;
       padding: 0;
       list-style: none;
@@ -82,334 +216,1121 @@
 
     .note-link {
       display: block;
-      min-height: 58px;
-      padding: 12px 14px;
+      padding: 8px 9px;
       border: 1px solid transparent;
-      border-radius: 8px;
+      border-radius: 6px;
       text-decoration: none;
-      transition: background 140ms ease, border-color 140ms ease;
+      transition: background .12s ease, color .12s ease, border-color .12s ease;
     }
 
-    .note-link:hover,
-    .note-link:focus,
+    .note-link:hover { background: var(--surface-3); }
     .note-link.active {
-      border-color: #b7d4ef;
-      background: var(--accent-soft);
-      outline: none;
+      border-color: var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
     }
 
     .note-title {
       display: block;
-      font-weight: 700;
-      line-height: 1.35;
+      color: var(--ink-soft);
+      font-size: 12.5px;
+      line-height: 1.42;
+      font-weight: 520;
     }
 
+    .note-link.active .note-title { color: var(--ink); font-weight: 680; }
     .note-date {
       display: block;
-      margin-top: 4px;
+      margin-top: 3px;
+      color: var(--faint);
+      font: 10.5px/1.3 ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+
+    .no-result {
+      padding: 18px 10px;
       color: var(--muted);
-      font-size: 0.86rem;
+      font-size: 12px;
+      text-align: center;
     }
 
-    .viewer {
-      max-width: 900px;
-      min-height: calc(100vh - 76px);
+    /* ---------- workspace ---------- */
+    .workspace { min-width: 0; background: var(--surface); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: var(--topbar-h);
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .topbar-inner {
+      height: 100%;
+      max-width: calc(var(--page-max) + 64px);
       margin: 0 auto;
-      padding: clamp(22px, 4vw, 48px);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .meta {
+    .mobile-menu { display: none; }
+
+    .crumb {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .crumb strong {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+    .crumb-sep { color: var(--faint); }
+
+    .icon-btn,
+    .text-btn {
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .icon-btn:hover,
+    .text-btn:hover { background: var(--surface-3); border-color: var(--line-strong); }
+    .icon-btn { width: 32px; padding: 0; display: grid; place-items: center; }
+    .icon-btn svg { width: 15px; height: 15px; }
+    .text-btn { padding: 0 10px; font-size: 11.5px; font-weight: 650; }
+
+    .page {
+      min-height: calc(100vh - var(--topbar-h));
+      padding: 0 28px 96px;
+    }
+
+    .doc-grid {
+      display: grid;
+      grid-template-columns: minmax(0, var(--article-max)) minmax(180px, 220px);
+      justify-content: center;
+      gap: 64px;
+      max-width: var(--page-max);
+      margin: 0 auto;
+    }
+
+    .article { min-width: 0; padding-top: 54px; }
+
+    .article-hero {
+      max-width: var(--prose-max);
+      margin-bottom: 56px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font: 700 10px/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 18px;
+      height: 1px;
+      background: var(--line-strong);
+    }
+
+    .article-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(32px, 4vw, 44px);
+      line-height: 1.14;
+      font-weight: 720;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+      word-break: keep-all;
+    }
+
+    .article-desc {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+
+    .article-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 16px;
-      margin-bottom: 24px;
-      font-size: 0.92rem;
-    }
-
-    .raw-link {
-      color: var(--accent);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .raw-link:hover,
-    .raw-link:focus {
-      text-decoration: underline;
-    }
-
-    #content h1,
-    #content h2,
-    #content h3 {
-      line-height: 1.3;
-      letter-spacing: 0;
-    }
-
-    #content h1 {
-      margin: 0 0 24px;
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-    }
-
-    #content h2 {
-      margin: 36px 0 14px;
-      padding-top: 8px;
-      border-top: 1px solid var(--line);
-      font-size: 1.45rem;
-    }
-
-    #content h3 {
-      margin: 26px 0 10px;
-      font-size: 1.15rem;
-    }
-
-    #content p,
-    #content ul,
-    #content ol,
-    #content pre,
-    #content blockquote {
-      margin: 0 0 16px;
-    }
-
-    #content ul,
-    #content ol {
-      padding-left: 1.35rem;
-    }
-
-    #content code {
-      border-radius: 5px;
-      background: #eef0f3;
-      padding: 0.15em 0.35em;
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-      font-size: 0.92em;
-    }
-
-    #content pre {
-      overflow-x: auto;
-      border-radius: 8px;
-      background: #202124;
-      color: #f7f7f7;
-      padding: 16px;
-    }
-
-    #content pre code {
-      background: transparent;
-      padding: 0;
-      color: inherit;
-    }
-
-    #content blockquote {
-      border-left: 4px solid var(--accent);
-      padding: 4px 0 4px 16px;
+      align-items: center;
+      gap: 8px 14px;
+      margin-top: 24px;
       color: var(--muted);
+      font-size: 11.5px;
+    }
+    .article-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--line-strong); }
+    .article-meta a { color: var(--accent-ink); font-weight: 650; text-decoration: none; }
+    .article-meta a:hover { text-decoration: underline; }
+
+    /* ---------- generated document ---------- */
+    .doc-content { min-width: 0; }
+    .doc-section {
+      position: relative;
+      padding: 0 0 52px;
+      margin: 0 0 52px;
+      border-bottom: 1px solid var(--line);
+    }
+    .doc-section:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+    .doc-section.intro { margin-top: -10px; }
+
+    .doc-section > :not(.wide-block) { max-width: var(--prose-max); }
+
+    .doc-content h2,
+    .doc-content h3,
+    .doc-content h4 {
+      position: relative;
+      color: var(--ink);
+      font-weight: 680;
+      letter-spacing: -.02em;
+      scroll-margin-top: calc(var(--topbar-h) + 28px);
+      word-break: keep-all;
     }
 
-    #content hr {
+    .doc-content h2 {
+      margin: 0 0 22px;
+      font-size: 24px;
+      line-height: 1.32;
+    }
+
+    .doc-content h3 {
+      margin: 34px 0 12px;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .doc-content h4 {
+      margin: 28px 0 10px;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .heading-anchor {
+      position: absolute;
+      left: -22px;
+      top: .12em;
+      opacity: 0;
+      color: var(--faint);
+      font-weight: 400;
+      text-decoration: none;
+      transition: opacity .12s ease;
+    }
+    h2:hover .heading-anchor,
+    h3:hover .heading-anchor { opacity: 1; }
+
+    .doc-content p,
+    .doc-content ul,
+    .doc-content ol,
+    .doc-content dl {
+      margin: 0 0 18px;
+      color: var(--ink-soft);
+      font-size: 15px;
+      line-height: 1.78;
+    }
+
+    .doc-section.intro > p:first-of-type:not(.callout *) {
+      color: var(--ink-soft);
+      font-size: 17px;
+      line-height: 1.78;
+    }
+
+    .doc-content strong { color: var(--ink); font-weight: 700; }
+    .doc-content em { color: var(--ink-soft); }
+    .doc-content ul,
+    .doc-content ol { padding-left: 1.45rem; }
+    .doc-content li { padding-left: .2rem; margin: 5px 0; }
+    .doc-content li::marker { color: var(--faint); }
+    .doc-content ul ul,
+    .doc-content ol ol,
+    .doc-content ul ol,
+    .doc-content ol ul { margin-top: 7px; margin-bottom: 7px; }
+
+    .doc-content a {
+      color: var(--accent-ink);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+    }
+    .doc-content a:hover { text-decoration-color: currentColor; }
+
+    .doc-content :not(pre) > code {
+      padding: .15em .36em;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--surface-3);
+      color: var(--ink);
+      font: .9em/1.5 ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      word-break: break-word;
+    }
+
+    .doc-content hr {
+      max-width: var(--prose-max);
       height: 1px;
-      margin: 30px 0;
+      margin: 38px 0;
       border: 0;
       background: var(--line);
     }
 
-    .empty {
+    /* wide blocks: visual content gets more room than prose */
+    .wide-block {
+      width: 100%;
+      max-width: var(--article-max);
+      margin: 24px 0 28px;
+    }
+
+    .code-card {
+      overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--code-bg) 85%, white);
+      border-radius: var(--radius);
+      background: var(--code-bg);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .code-toolbar {
+      height: 34px;
+      padding: 0 9px 0 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: var(--code-head);
+      color: #aeb3bd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font: 10.5px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+
+    .code-lang { text-transform: lowercase; }
+    .copy-btn {
+      height: 24px;
+      padding: 0 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 4px;
+      background: rgba(255,255,255,.035);
+      color: #c7cbd2;
+      cursor: pointer;
+      font: 10px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,.08); }
+
+    .doc-content pre {
+      overflow: auto;
+      margin: 0;
+      padding: 17px 18px 20px;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      tab-size: 2;
+      scrollbar-width: thin;
+      scrollbar-color: #555a64 transparent;
+    }
+    .doc-content pre code {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: 12.5px/1.72 ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      white-space: pre;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+    }
+    .doc-content table {
+      width: 100%;
+      min-width: 560px;
+      border-collapse: collapse;
+      color: var(--ink-soft);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+    .doc-content th,
+    .doc-content td {
+      padding: 11px 13px;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .doc-content tr:last-child td { border-bottom: 0; }
+    .doc-content th:last-child,
+    .doc-content td:last-child { border-right: 0; }
+    .doc-content th {
+      background: var(--surface-2);
+      color: var(--ink);
+      font-weight: 680;
+      white-space: nowrap;
+    }
+    .doc-content tbody tr:hover { background: color-mix(in srgb, var(--surface-3) 62%, transparent); }
+
+    .callout {
+      position: relative;
+      padding: 14px 16px 14px 44px;
+      border: 1px solid var(--line);
+      border-left-width: 3px;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      color: var(--ink-soft);
+    }
+    .callout::before {
+      position: absolute;
+      left: 16px;
+      top: 14px;
       display: grid;
-      min-height: 55vh;
+      width: 18px;
+      height: 18px;
       place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      font: 700 10px/1 ui-monospace, monospace;
+      content: "i";
+    }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout.note { background: var(--info-soft); border-left-color: var(--info-line); }
+    .callout.tip { background: var(--success-soft); border-left-color: var(--success-line); }
+    .callout.warning { background: var(--warn-soft); border-left-color: var(--warn-line); }
+    .callout.danger { background: var(--danger-soft); border-left-color: var(--danger-line); }
+    .callout.tip::before { content: "✓"; }
+    .callout.warning::before { content: "!"; }
+    .callout.danger::before { content: "!"; }
+
+    .doc-content blockquote:not(.callout) {
+      margin: 24px 0;
+      padding: 3px 0 3px 18px;
+      border-left: 2px solid var(--line-strong);
+      color: var(--muted);
+    }
+    .doc-content blockquote:not(.callout) p { color: inherit; font-style: italic; }
+    .doc-content blockquote:not(.callout) p:last-child { margin-bottom: 0; }
+
+    .media-frame {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      box-shadow: var(--shadow-soft);
+    }
+    .media-frame img { display: block; width: 100%; height: auto; }
+    .media-caption {
+      padding: 9px 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .task-list-item { list-style: none; margin-left: -1.25rem !important; }
+    .task-list-item input { margin: 0 8px 0 0; accent-color: var(--accent); transform: translateY(1px); }
+
+    /* ---------- article toc ---------- */
+    .toc {
+      position: sticky;
+      top: calc(var(--topbar-h) + 28px);
+      align-self: start;
+      max-height: calc(100vh - var(--topbar-h) - 56px);
+      overflow-y: auto;
+      padding: 28px 0 24px;
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    .toc:hover { scrollbar-color: var(--line-strong) transparent; }
+    .toc-title {
+      margin-bottom: 10px;
+      color: var(--faint);
+      font-size: 10px;
+      line-height: 1.4;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .toc-list { margin: 0; padding: 0; list-style: none; }
+    .toc-link {
+      display: block;
+      margin-left: 0;
+      padding: 5px 8px;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11.5px;
+      line-height: 1.42;
+      text-decoration: none;
+      transition: color .12s ease, border-color .12s ease;
+    }
+    .toc-link.level-3 { padding-left: 18px; font-size: 11px; }
+    .toc-link:hover { color: var(--ink); }
+    .toc-link.active { color: var(--ink); border-left: 2px solid var(--accent); font-weight: 650; }
+    .toc-empty { color: var(--muted); font-size: 11px; }
+
+    /* ---------- start / error ---------- */
+    .start-state {
+      min-height: calc(100vh - var(--topbar-h) - 80px);
+      display: grid;
+      place-items: center;
+      padding: 48px 20px;
+    }
+    .start-card {
+      width: min(620px, 100%);
       text-align: center;
     }
-
-    .empty h2 {
-      margin: 0 0 8px;
-      color: var(--ink);
-      font-size: 1.5rem;
+    .start-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      margin: 0 auto 20px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-2);
+      box-shadow: var(--shadow-soft);
     }
-
-    .empty p {
+    .start-icon svg { width: 20px; height: 20px; color: var(--muted); }
+    .start-card h2 {
       margin: 0;
+      font-size: 24px;
+      line-height: 1.35;
+      letter-spacing: -.025em;
+    }
+    .start-card p {
+      max-width: 480px;
+      margin: 10px auto 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .start-actions { display: flex; justify-content: center; gap: 8px; margin-top: 22px; }
+    .primary-btn {
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--ink);
+      border-radius: 6px;
+      background: var(--ink);
+      color: var(--surface);
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .primary-btn:hover { opacity: .9; }
+
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      z-index: 100;
+      height: 2px;
+      width: 0;
+      background: var(--accent);
+      opacity: 0;
+      transition: width .35s ease, opacity .2s ease;
+    }
+    .loading-bar.on { width: calc(100% - var(--sidebar-w)); opacity: 1; }
+
+    /* ---------- mobile ---------- */
+    .mobile-backdrop { display: none; }
+
+    @media (max-width: 1180px) {
+      .doc-grid { grid-template-columns: minmax(0, var(--article-max)); }
+      .toc { display: none; }
     }
 
-    @media (max-width: 780px) {
-      .layout {
-        grid-template-columns: 1fr;
+    @media (max-width: 820px) {
+      :root { --sidebar-w: 280px; }
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: var(--sidebar-w);
+        transform: translateX(-102%);
+        transition: transform .2s ease;
+        box-shadow: 18px 0 30px -24px rgba(0,0,0,.35);
       }
+      body.nav-open .sidebar { transform: translateX(0); }
+      .mobile-backdrop {
+        position: fixed;
+        z-index: 25;
+        inset: 0;
+        border: 0;
+        background: rgba(0,0,0,.28);
+      }
+      body.nav-open .mobile-backdrop { display: block; }
+      .mobile-menu { display: grid; }
+      .loading-bar { left: 0; }
+      .loading-bar.on { width: 100%; }
+      .topbar-inner { padding: 0 16px; }
+      .page { padding: 0 18px 72px; }
+      .article { padding-top: 40px; }
+      .article-hero { margin-bottom: 44px; }
+      .article-title { font-size: clamp(29px, 8vw, 38px); }
+      .doc-section { padding-bottom: 42px; margin-bottom: 42px; }
+    }
 
-      aside {
-        position: static;
-        border-right: 0;
-        border-bottom: 1px solid var(--line);
-      }
+    @media (max-width: 560px) {
+      .topbar .text-btn { display: none; }
+      .page { padding-inline: 16px; }
+      .article { padding-top: 34px; }
+      .article-hero { margin-bottom: 38px; }
+      .doc-content h2 { font-size: 21px; }
+      .doc-content h3 { font-size: 17px; }
+      .doc-content p,
+      .doc-content ul,
+      .doc-content ol { font-size: 14.5px; }
+      .doc-section.intro > p:first-of-type:not(.callout *) { font-size: 16px; }
+      .heading-anchor { display: none; }
+      .code-toolbar { height: 32px; }
+      .doc-content pre { padding: 14px; }
+    }
 
-      main {
-        padding: 18px;
-      }
-
-      .viewer {
-        min-height: auto;
-      }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="layout">
-    <aside>
-      <div class="brand">
-        <h1>Study Notes</h1>
-        <p>GitHub Pages용 Markdown 노트 모음</p>
+  <div class="loading-bar" id="loadingBar"></div>
+  <button class="mobile-backdrop" id="mobileBackdrop" aria-label="메뉴 닫기"></button>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-head">
+        <div class="brand-row">
+          <div class="brand-mark">SN</div>
+          <div class="brand-copy">
+            <h1>Study Notes</h1>
+            <p>Personal technical notebook</p>
+          </div>
+        </div>
+
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>
+          </svg>
+          <input class="search" id="noteSearch" type="search" placeholder="노트 검색" autocomplete="off" aria-label="노트 검색">
+        </div>
       </div>
-      <nav aria-label="노트 목록">
-        <ul class="note-list" id="noteList"></ul>
-      </nav>
+
+      <nav class="note-nav" id="noteNav" aria-label="노트 목록"></nav>
     </aside>
 
-    <main>
-      <article class="viewer">
-        <div class="meta" id="meta" hidden></div>
-        <section id="content" class="empty">
-          <div>
-            <h2>노트를 선택하세요</h2>
-            <p>왼쪽 목록에서 Markdown 파일을 클릭하면 여기에서 바로 볼 수 있습니다.</p>
+    <main class="workspace">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <button class="icon-btn mobile-menu" id="mobileMenu" type="button" aria-label="노트 목록 열기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+
+          <div class="crumb" aria-live="polite">
+            <span>Notes</span><span class="crumb-sep">/</span><strong id="crumbTitle">Overview</strong>
+          </div>
+
+          <button class="text-btn" id="rawButton" type="button" hidden>원문 열기</button>
+          <button class="icon-btn" id="themeButton" type="button" aria-label="테마 전환" title="테마 전환">
+            <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-.9-.1-1.4A7 7 0 0 1 12 3Z"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="page" id="page">
+        <section class="start-state" id="startState">
+          <div class="start-card">
+            <div class="start-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h5M9 12h6M9 16h6"></path></svg>
+            </div>
+            <h2>읽을 노트를 선택하세요</h2>
+            <p>Markdown은 그대로 노출하지 않고, 제목·섹션·코드·표·인용문을 분석해 읽기 좋은 문서 레이아웃으로 다시 구성합니다.</p>
+            <div class="start-actions">
+              <button class="primary-btn" id="latestButton" type="button">가장 최근 노트 열기</button>
+            </div>
           </div>
         </section>
-      </article>
+
+        <div class="doc-grid" id="docGrid" hidden>
+          <article class="article">
+            <header class="article-hero" id="articleHero"></header>
+            <div class="doc-content" id="content"></div>
+          </article>
+          <aside class="toc" id="toc" aria-label="현재 문서 목차"></aside>
+        </div>
+      </div>
     </main>
   </div>
 
+  <!-- Markdown parser. Custom UI/CSS/JS is all contained in this single HTML file. -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
     const notes = [
-      {
-        title: "MQTT 브로커 개념 정리",
-        date: "2026-06-02",
-        file: "2026 06 02 mqtt 브로커.md"
-      },
-      {
-        title: "MQTT와 IoT 보안 정리",
-        date: "2026-06-05",
-        file: "2026 06 05 mqtt iot보안.md"
-      },
-      {
-        title: "GCP 무료티어 + Cloudflare Tunnel 개념 정리",
-        date: "2026-06-08",
-        file: "2026 06 08 gcp cloudflare터널 개념정리.md"
-      },
-      {
-        title: "리버스프록시 구조 통신보안분석",
-        date: "2026-06-11",
-        file: "2026 06 11 리버스프록시 구조 통신보안분석.md"
-      },
-      {
-        title: "트랜잭션과 ACID 정리",
-        date: "2026-07-21",
-        file: "2026 07 21 트랜잭션.md"
-      },
-      {
-        title: "커넥션 풀 개념 정리",
-        date: "2026-07-21",
-        file: "2026 07 21 커넥션풀.md"
-      },
-      {
-        title: "Redis 정리 + 간단 예제",
-        date: "2026-07-22",
-        file: "2026 07 22 redis.md"
-      },
-      { 
-        title: "Lua 내장 스크립트 개념 정리",
-        date: "2026-07-22",
-        file: "2026 07 22 lua 내장스크립트 개념정리.md"
-      },
-      {
-        title: "서버사이드 클라이언트사이드 아키텍처",
-        date: "2026-08-19",
-        file: "2026 08 19 서버사이드 클라이언트사이드 아키텍처.md"
-      }
+      { title: "MQTT 브로커 개념 정리", date: "2026-06-02", file: "2026 06 02 mqtt 브로커.md" },
+      { title: "MQTT와 IoT 보안 정리", date: "2026-06-05", file: "2026 06 05 mqtt iot보안.md" },
+      { title: "GCP 무료티어 + Cloudflare Tunnel 개념 정리", date: "2026-06-08", file: "2026 06 08 gcp cloudflare터널 개념정리.md" },
+      { title: "리버스프록시 구조 통신보안분석", date: "2026-06-11", file: "2026 06 11 리버스프록시 구조 통신보안분석.md" },
+      { title: "트랜잭션과 ACID 정리", date: "2026-07-21", file: "2026 07 21 트랜잭션.md" },
+      { title: "커넥션 풀 개념 정리", date: "2026-07-21", file: "2026 07 21 커넥션풀.md" },
+      { title: "Redis 정리 + 간단 예제", date: "2026-07-22", file: "2026 07 22 redis.md" },
+      { title: "Lua 내장 스크립트 개념 정리", date: "2026-07-22", file: "2026 07 22 lua 내장스크립트 개념정리.md" },
+      { title: "서버사이드 클라이언트사이드 아키텍처", date: "2026-08-19", file: "2026 08 19 서버사이드 클라이언트사이드 아키텍처.md" }
     ];
 
-    const noteList = document.querySelector("#noteList");
+    const noteNav = document.querySelector("#noteNav");
+    const noteSearch = document.querySelector("#noteSearch");
+    const startState = document.querySelector("#startState");
+    const docGrid = document.querySelector("#docGrid");
+    const articleHero = document.querySelector("#articleHero");
     const content = document.querySelector("#content");
-    const meta = document.querySelector("#meta");
+    const toc = document.querySelector("#toc");
+    const crumbTitle = document.querySelector("#crumbTitle");
+    const rawButton = document.querySelector("#rawButton");
+    const themeButton = document.querySelector("#themeButton");
+    const themeIcon = document.querySelector("#themeIcon");
+    const loadingBar = document.querySelector("#loadingBar");
+    const latestButton = document.querySelector("#latestButton");
+    const startCard = document.querySelector(".start-card");
+    const initialStartMarkup = startCard.innerHTML;
+    const mobileMenu = document.querySelector("#mobileMenu");
+    const mobileBackdrop = document.querySelector("#mobileBackdrop");
 
-    function noteUrl(file) {
-      return encodeURI(file);
+    let currentFile = null;
+    let scrollObserver = null;
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
     }
 
-    function renderList() {
-      noteList.innerHTML = notes.map((note) => `
-        <li>
-          <a class="note-link" href="?note=${encodeURIComponent(note.file)}" data-file="${note.file}">
-            <span class="note-title">${note.title}</span>
-            <span class="note-date">${note.date}</span>
-          </a>
-        </li>
+    function noteUrl(file) { return encodeURI(file); }
+
+    function monthLabel(date) {
+      const [year, month] = date.split("-");
+      return `${year}.${month}`;
+    }
+
+    function renderList(filter = "") {
+      const query = filter.trim().toLocaleLowerCase("ko");
+      const filtered = [...notes]
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .filter(note => !query || `${note.title} ${note.date} ${note.file}`.toLocaleLowerCase("ko").includes(query));
+
+      if (!filtered.length) {
+        noteNav.innerHTML = `<div class="no-result">일치하는 노트가 없습니다.</div>`;
+        return;
+      }
+
+      const groups = new Map();
+      filtered.forEach(note => {
+        const key = monthLabel(note.date);
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(note);
+      });
+
+      noteNav.innerHTML = [...groups.entries()].map(([month, group]) => `
+        <section class="nav-group">
+          <div class="nav-label">${month}</div>
+          <ul class="note-list">
+            ${group.map(note => `
+              <li>
+                <a class="note-link ${note.file === currentFile ? "active" : ""}"
+                   href="?note=${encodeURIComponent(note.file)}"
+                   data-file="${escapeHtml(note.file)}">
+                  <span class="note-title">${escapeHtml(note.title)}</span>
+                  <span class="note-date">${escapeHtml(note.date)}</span>
+                </a>
+              </li>
+            `).join("")}
+          </ul>
+        </section>
       `).join("");
     }
 
-    async function loadNote(file) {
-      const note = notes.find((item) => item.file === file) || notes[0];
-      const response = await fetch(noteUrl(note.file));
+    function showLoading(on) {
+      loadingBar.classList.toggle("on", on);
+      if (!on) setTimeout(() => { loadingBar.style.width = "0"; }, 220);
+    }
 
-      if (!response.ok) {
-        throw new Error(`${note.file} 파일을 불러오지 못했습니다.`);
+    async function loadNote(file, { pushHistory = false } = {}) {
+      const note = notes.find(item => item.file === file);
+      if (!note) throw new Error("목록에 없는 노트입니다.");
+
+      showLoading(true);
+      try {
+        const response = await fetch(noteUrl(note.file));
+        if (!response.ok) throw new Error(`${note.file} 파일을 불러오지 못했습니다. (${response.status})`);
+        const markdown = await response.text();
+
+        currentFile = note.file;
+        if (pushHistory) history.pushState({ file: note.file }, "", `?note=${encodeURIComponent(note.file)}`);
+        renderList(noteSearch.value);
+        renderDocument(note, markdown);
+        document.body.classList.remove("nav-open");
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function markdownToHtml(markdown) {
+      if (window.marked?.parse) {
+        window.marked.setOptions({ gfm: true, breaks: false });
+        return window.marked.parse(markdown);
       }
 
-      const markdown = await response.text();
-      const renderer = window.marked?.parse
-        ? window.marked.parse(markdown)
-        : `<pre>${markdown.replace(/[&<>"']/g, (char) => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            "\"": "&quot;",
-            "'": "&#39;"
-          })[char])}</pre>`;
+      // Minimal emergency fallback when CDN is unavailable.
+      return `<pre>${escapeHtml(markdown)}</pre>`;
+    }
 
-      document.title = `${note.title} | Study Notes`;
-      meta.hidden = false;
-      meta.innerHTML = `
-        <span>${note.date}</span>
-        <a class="raw-link" href="${noteUrl(note.file)}" target="_blank" rel="noreferrer">원문 열기</a>
-      `;
-      content.classList.remove("empty");
-      content.innerHTML = renderer;
-
-      document.querySelectorAll(".note-link").forEach((link) => {
-        link.classList.toggle("active", link.dataset.file === note.file);
+    function sanitizeTree(root) {
+      root.querySelectorAll("script, iframe, object, embed").forEach(el => el.remove());
+      root.querySelectorAll("*").forEach(el => {
+        [...el.attributes].forEach(attr => {
+          if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+          if ((attr.name === "href" || attr.name === "src") && /^javascript:/i.test(attr.value.trim())) {
+            el.removeAttribute(attr.name);
+          }
+        });
       });
     }
 
-    renderList();
+    function slugify(text, used) {
+      const base = text
+        .trim()
+        .toLocaleLowerCase("ko")
+        .replace(/<[^>]+>/g, "")
+        .replace(/[^\p{L}\p{N}]+/gu, "-")
+        .replace(/^-+|-+$/g, "") || "section";
+      let slug = base;
+      let i = 2;
+      while (used.has(slug)) slug = `${base}-${i++}`;
+      used.add(slug);
+      return slug;
+    }
 
-    noteList.addEventListener("click", (event) => {
+    function estimateReadingTime(markdown) {
+      const clean = markdown
+        .replace(/```[\s\S]*?```/g, " ")
+        .replace(/`[^`]*`/g, " ")
+        .replace(/[#>*_\-\[\]()]/g, " ");
+      const latinWords = (clean.match(/[A-Za-z0-9]+/g) || []).length;
+      const koreanChars = (clean.match(/[가-힣]/g) || []).length;
+      const units = latinWords + koreanChars / 2.2;
+      return Math.max(1, Math.round(units / 220));
+    }
+
+    function extractFrontmatter(markdown) {
+      const match = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*(?:\n|$)/);
+      if (!match) return { meta: {}, body: markdown };
+
+      const meta = {};
+      match[1].split(/\r?\n/).forEach(line => {
+        const separator = line.indexOf(":");
+        if (separator < 1) return;
+        const key = line.slice(0, separator).trim().toLowerCase();
+        let value = line.slice(separator + 1).trim();
+        value = value.replace(/^(["'])(.*)\1$/, "$2");
+        if (key === "tags") {
+          value = value.replace(/^\[|\]$/g, "").split(",").map(v => v.trim()).filter(Boolean);
+        }
+        meta[key] = value;
+      });
+
+      return { meta, body: markdown.slice(match[0].length) };
+    }
+
+    function findLeadElement(root, titleElement) {
+      const candidates = [...root.children];
+      const start = titleElement ? candidates.indexOf(titleElement) + 1 : 0;
+      for (let i = Math.max(0, start); i < candidates.length; i++) {
+        const el = candidates[i];
+        if (el.tagName === "H2") break;
+        if (el.tagName === "P" && el.textContent.trim().length >= 30) return el;
+      }
+      return null;
+    }
+
+    function renderDocument(note, markdown) {
+      const { meta: frontmatter, body: markdownBody } = extractFrontmatter(markdown);
+      const scratch = document.createElement("div");
+      scratch.innerHTML = markdownToHtml(markdownBody);
+      sanitizeTree(scratch);
+
+      const sourceH1 = scratch.querySelector(":scope > h1");
+      const title = frontmatter.title || sourceH1?.textContent.trim() || note.title;
+      const leadElement = findLeadElement(scratch, sourceH1);
+      const lead = frontmatter.description || leadElement?.textContent.trim() || "Markdown 원문을 문서 구조로 다시 조립한 학습 노트입니다.";
+      const displayDate = frontmatter.date || note.date;
+      const category = frontmatter.category || "Study Note";
+      const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
+      if (sourceH1) sourceH1.remove();
+      if (leadElement && !frontmatter.description) leadElement.remove();
+
+      const readMin = estimateReadingTime(markdownBody);
+      const h2Count = scratch.querySelectorAll("h2").length;
+
+      articleHero.innerHTML = `
+        <div class="eyebrow">${escapeHtml(category)}</div>
+        <h1 class="article-title">${escapeHtml(title)}</h1>
+        <p class="article-desc">${escapeHtml(lead)}</p>
+        <div class="article-meta">
+          <span>${escapeHtml(displayDate)}</span>
+          <span class="dot"></span>
+          <span>약 ${readMin}분</span>
+          <span class="dot"></span>
+          <span>${h2Count ? `섹션 ${h2Count}개` : "짧은 노트"}</span>
+          ${tags.length ? `<span class="dot"></span><span>${tags.map(tag => `#${escapeHtml(tag)}`).join(" · ")}</span>` : ""}
+          <span class="dot"></span>
+          <a href="${noteUrl(note.file)}" target="_blank" rel="noreferrer">Markdown 원문</a>
+        </div>
+      `;
+
+      content.replaceChildren(...scratch.childNodes);
+      enhanceDocument(content);
+      buildSections(content);
+      buildToc(content);
+
+      document.title = `${title} | Study Notes`;
+      crumbTitle.textContent = title;
+      rawButton.hidden = false;
+      rawButton.onclick = () => window.open(noteUrl(note.file), "_blank", "noopener,noreferrer");
+      if (startCard.innerHTML !== initialStartMarkup) startCard.innerHTML = initialStartMarkup;
+      startState.hidden = true;
+      docGrid.hidden = false;
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    function enhanceDocument(root) {
+      const usedIds = new Set();
+
+      root.querySelectorAll("h2, h3").forEach(heading => {
+        const id = slugify(heading.textContent, usedIds);
+        heading.id = id;
+        const anchor = document.createElement("a");
+        anchor.className = "heading-anchor";
+        anchor.href = `#${id}`;
+        anchor.setAttribute("aria-label", `${heading.textContent} 링크`);
+        anchor.textContent = "#";
+        heading.prepend(anchor);
+      });
+
+      root.querySelectorAll("pre").forEach(pre => {
+        if (pre.closest(".code-card")) return;
+        const code = pre.querySelector("code");
+        const langClass = [...(code?.classList || [])].find(name => name.startsWith("language-"));
+        const lang = langClass ? langClass.replace("language-", "") : "code";
+
+        const card = document.createElement("div");
+        card.className = "wide-block code-card";
+        const toolbar = document.createElement("div");
+        toolbar.className = "code-toolbar";
+        toolbar.innerHTML = `<span class="code-lang">${escapeHtml(lang)}</span><button class="copy-btn" type="button">copy</button>`;
+        pre.parentNode.insertBefore(card, pre);
+        card.append(toolbar, pre);
+
+        toolbar.querySelector(".copy-btn").addEventListener("click", async event => {
+          const button = event.currentTarget;
+          try {
+            await navigator.clipboard.writeText(code?.textContent || pre.textContent);
+            button.textContent = "copied";
+            setTimeout(() => button.textContent = "copy", 1200);
+          } catch {
+            button.textContent = "failed";
+            setTimeout(() => button.textContent = "copy", 1200);
+          }
+        });
+      });
+
+      root.querySelectorAll("table").forEach(table => {
+        if (table.closest(".table-wrap")) return;
+        const wrap = document.createElement("div");
+        wrap.className = "wide-block table-wrap";
+        table.parentNode.insertBefore(wrap, table);
+        wrap.append(table);
+      });
+
+      root.querySelectorAll("blockquote").forEach(block => {
+        const raw = block.textContent.trim();
+        const types = [
+          { cls: "danger", re: /^(\[!DANGER\]|DANGER:?|위험:?)/i },
+          { cls: "warning", re: /^(\[!WARNING\]|WARNING:?|주의:?|경고:?)/i },
+          { cls: "tip", re: /^(\[!TIP\]|TIP:?|팁:?)/i },
+          { cls: "note", re: /^(\[!NOTE\]|NOTE:?|참고:?|메모:?)/i }
+        ];
+        const hit = types.find(item => item.re.test(raw));
+        if (!hit) return;
+        block.classList.add("callout", hit.cls);
+        const first = block.querySelector("p");
+        if (first) first.innerHTML = first.innerHTML.replace(hit.re, "").replace(/^\s*<br\s*\/?>/i, "").trim();
+      });
+
+      root.querySelectorAll("p > img:only-child").forEach(img => {
+        const p = img.parentElement;
+        const frame = document.createElement("figure");
+        frame.className = "wide-block media-frame";
+        p.parentNode.insertBefore(frame, p);
+        frame.append(img);
+        const alt = img.getAttribute("alt")?.trim();
+        if (alt) {
+          const cap = document.createElement("figcaption");
+          cap.className = "media-caption";
+          cap.textContent = alt;
+          frame.append(cap);
+        }
+        p.remove();
+      });
+
+      root.querySelectorAll("a[href]").forEach(link => {
+        const href = link.getAttribute("href");
+        if (/^https?:\/\//i.test(href)) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+      });
+
+      root.querySelectorAll('input[type="checkbox"]').forEach(box => {
+        box.disabled = true;
+        box.closest("li")?.classList.add("task-list-item");
+      });
+    }
+
+    function buildSections(root) {
+      const nodes = [...root.childNodes];
+      root.textContent = "";
+
+      let section = document.createElement("section");
+      section.className = "doc-section intro";
+      root.append(section);
+
+      nodes.forEach(node => {
+        if (node.nodeType === 1 && node.tagName === "H2") {
+          if (!section.childNodes.length && section.classList.contains("intro")) section.remove();
+          section = document.createElement("section");
+          section.className = "doc-section";
+          root.append(section);
+        }
+        section.append(node);
+      });
+
+      [...root.querySelectorAll(":scope > .doc-section")].forEach(sec => {
+        if (!sec.textContent.trim() && !sec.querySelector("img, pre, table")) sec.remove();
+      });
+    }
+
+    function buildToc(root) {
+      if (scrollObserver) scrollObserver.disconnect();
+      const headings = [...root.querySelectorAll("h2, h3")];
+
+      if (!headings.length) {
+        toc.innerHTML = `<div class="toc-title">On this page</div><div class="toc-empty">목차가 없는 짧은 노트입니다.</div>`;
+        return;
+      }
+
+      toc.innerHTML = `
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          ${headings.map(h => `
+            <li><a class="toc-link level-${h.tagName === "H2" ? "2" : "3"}" href="#${h.id}">${escapeHtml(h.textContent.replace(/^#/, "").trim())}</a></li>
+          `).join("")}
+        </ul>
+      `;
+
+      const links = new Map([...toc.querySelectorAll(".toc-link")].map(link => [link.getAttribute("href").slice(1), link]));
+      scrollObserver = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (!visible) return;
+        links.forEach(link => link.classList.remove("active"));
+        links.get(visible.target.id)?.classList.add("active");
+      }, { rootMargin: "-70px 0px -72% 0px", threshold: [0, 1] });
+
+      headings.forEach(h => scrollObserver.observe(h));
+    }
+
+    function showError(error) {
+      currentFile = null;
+      renderList(noteSearch.value);
+      docGrid.hidden = true;
+      startState.hidden = false;
+      crumbTitle.textContent = "Error";
+      rawButton.hidden = true;
+      startCard.innerHTML = `
+        <div class="start-icon">!</div>
+        <h2>파일을 열 수 없습니다</h2>
+        <p>${escapeHtml(error.message)}</p>
+        <div class="start-actions"><button class="primary-btn" type="button" onclick="location.reload()">다시 시도</button></div>
+      `;
+    }
+
+    function setTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem("study-notes-theme", theme);
+      const dark = theme === "dark";
+      themeIcon.innerHTML = dark
+        ? '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>'
+        : '<path d="M12 3a9 9 0 1 0 9 9c0-.5 0-.9-.1-1.4A7 7 0 0 1 12 3Z"></path>';
+    }
+
+    noteNav.addEventListener("click", event => {
       const link = event.target.closest(".note-link");
       if (!link) return;
-
       event.preventDefault();
-      const file = link.dataset.file;
-      history.pushState({ file }, "", `?note=${encodeURIComponent(file)}`);
-      loadNote(file).catch(showError);
+      loadNote(link.dataset.file, { pushHistory: true }).catch(showError);
+    });
+
+    noteSearch.addEventListener("input", () => renderList(noteSearch.value));
+
+    startState.addEventListener("click", event => {
+      if (!event.target.closest("#latestButton")) return;
+      const latest = [...notes].sort((a, b) => b.date.localeCompare(a.date))[0];
+      loadNote(latest.file, { pushHistory: true }).catch(showError);
     });
 
     window.addEventListener("popstate", () => {
       const file = new URLSearchParams(location.search).get("note");
       if (file) loadNote(file).catch(showError);
+      else {
+        currentFile = null;
+        renderList(noteSearch.value);
+        docGrid.hidden = true;
+        if (startCard.innerHTML !== initialStartMarkup) startCard.innerHTML = initialStartMarkup;
+        startState.hidden = false;
+        crumbTitle.textContent = "Overview";
+        rawButton.hidden = true;
+      }
     });
 
-    function showError(error) {
-      meta.hidden = true;
-      content.classList.add("empty");
-      content.innerHTML = `
-        <div>
-          <h2>파일을 열 수 없습니다</h2>
-          <p>${error.message}</p>
-        </div>
-      `;
-    }
+    mobileMenu.addEventListener("click", () => document.body.classList.toggle("nav-open"));
+    mobileBackdrop.addEventListener("click", () => document.body.classList.remove("nav-open"));
+
+    themeButton.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      setTheme(next);
+    });
+
+    const savedTheme = localStorage.getItem("study-notes-theme");
+    const systemDark = matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(savedTheme || (systemDark ? "dark" : "light"));
+
+    renderList();
 
     const initialFile = new URLSearchParams(location.search).get("note");
-    if (initialFile) {
-      loadNote(initialFile).catch(showError);
-    }
+    if (initialFile) loadNote(initialFile).catch(showError);
   </script>
 </body>
 </html>
