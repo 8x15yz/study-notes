@@ -649,6 +649,40 @@
     .task-list-item { list-style: none; margin-left: -1.25rem !important; }
     .task-list-item input { margin: 0 8px 0 0; accent-color: var(--accent); transform: translateY(1px); }
 
+    /* ---------- mermaid diagram card ---------- */
+    .diagram-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      box-shadow: var(--shadow-soft);
+    }
+    .diagram-toolbar {
+      height: 34px;
+      padding: 0 9px 0 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-3);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font: 10.5px/1 ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+    .diagram-body {
+      padding: 18px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-body svg { max-width: 100%; height: auto; }
+    .diagram-body.is-error {
+      display: block;
+      color: var(--danger-line);
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
     /* ---------- article toc ---------- */
     .toc {
       position: sticky;
@@ -879,8 +913,25 @@
     </main>
   </div>
 
-  <!-- Markdown parser. Custom UI/CSS/JS is all contained in this single HTML file. -->
+  <!-- Markdown parser & diagram renderer. Custom UI/CSS/JS is all contained in this single HTML file. -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    // 모듈 스크립트(mermaid)는 파싱 완료 후 비동기로 로드되므로,
+    // 아래쪽 동기 스크립트가 먼저 실행돼도 준비가 끝날 때까지 기다릴 수 있도록 프라미스를 미리 만들어 둔다.
+    let resolveMermaidReady;
+    window.mermaidReady = new Promise(resolve => { resolveMermaidReady = resolve; });
+  </script>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    window.mermaid = mermaid;
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: document.documentElement.dataset.theme === "dark" ? "dark" : "default",
+      fontFamily: "Inter, Pretendard, -apple-system, sans-serif"
+    });
+    resolveMermaidReady();
+  </script>
   <script>
     const notes = [
       { title: "MQTT 브로커 개념 정리", date: "2026-06-02", file: "2026 06 02 mqtt 브로커.md" },
@@ -914,6 +965,7 @@
 
     let currentFile = null;
     let scrollObserver = null;
+    let mermaidSeq = 0;
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, char => ({
@@ -983,7 +1035,7 @@
         currentFile = note.file;
         if (pushHistory) history.pushState({ file: note.file }, "", `?note=${encodeURIComponent(note.file)}`);
         renderList(noteSearch.value);
-        renderDocument(note, markdown);
+        await renderDocument(note, markdown);
         document.body.classList.remove("nav-open");
       } finally {
         showLoading(false);
@@ -1068,7 +1120,7 @@
       return null;
     }
 
-    function renderDocument(note, markdown) {
+    async function renderDocument(note, markdown) {
       const { meta: frontmatter, body: markdownBody } = extractFrontmatter(markdown);
       const scratch = document.createElement("div");
       scratch.innerHTML = markdownToHtml(markdownBody);
@@ -1104,7 +1156,7 @@
       `;
 
       content.replaceChildren(...scratch.childNodes);
-      enhanceDocument(content);
+      await enhanceDocument(content);
       buildSections(content);
       buildToc(content);
 
@@ -1122,7 +1174,47 @@
       });
     }
 
-    function enhanceDocument(root) {
+    // ```mermaid 코드블록을 감지해 SVG 다이어그램으로 렌더링한다.
+    // 실패 시(문법 오류 등) 원본 코드를 그대로 보여주는 코드카드로 되돌아간다.
+    async function renderMermaidBlocks(root) {
+      const blocks = [...root.querySelectorAll("pre > code.language-mermaid")];
+      if (!blocks.length) return;
+
+      // mermaid 모듈이 아직 로드 중이면 최대 4초까지 기다린다(느린 네트워크 대비).
+      await Promise.race([
+        window.mermaidReady,
+        new Promise(resolve => setTimeout(resolve, 4000))
+      ]);
+      if (!window.mermaid) return;
+
+      for (const code of blocks) {
+        const pre = code.closest("pre");
+        const source = code.textContent;
+        const id = `mermaid-${Date.now()}-${mermaidSeq++}`;
+
+        const card = document.createElement("div");
+        card.className = "wide-block diagram-card";
+        const toolbar = document.createElement("div");
+        toolbar.className = "diagram-toolbar";
+        toolbar.innerHTML = `<span>diagram · mermaid</span>`;
+        const body = document.createElement("div");
+        body.className = "diagram-body";
+
+        try {
+          const { svg } = await window.mermaid.render(id, source);
+          body.innerHTML = svg;
+        } catch (err) {
+          body.classList.add("is-error");
+          body.textContent = `mermaid 렌더링 실패: ${err.message || err}`;
+        }
+
+        card.append(toolbar, body);
+        pre.parentNode.insertBefore(card, pre);
+        pre.remove();
+      }
+    }
+
+    async function enhanceDocument(root) {
       const usedIds = new Set();
 
       root.querySelectorAll("h2, h3").forEach(heading => {
@@ -1136,8 +1228,11 @@
         heading.prepend(anchor);
       });
 
+      // mermaid 블록은 코드카드가 아닌 다이어그램으로 먼저 치환한다.
+      await renderMermaidBlocks(root);
+
       root.querySelectorAll("pre").forEach(pre => {
-        if (pre.closest(".code-card")) return;
+        if (pre.closest(".code-card") || pre.closest(".diagram-card")) return;
         const code = pre.querySelector("code");
         const langClass = [...(code?.classList || [])].find(name => name.startsWith("language-"));
         const lang = langClass ? langClass.replace("language-", "") : "code";
@@ -1235,7 +1330,7 @@
       });
 
       [...root.querySelectorAll(":scope > .doc-section")].forEach(sec => {
-        if (!sec.textContent.trim() && !sec.querySelector("img, pre, table")) sec.remove();
+        if (!sec.textContent.trim() && !sec.querySelector("img, pre, table, svg")) sec.remove();
       });
     }
 
@@ -1292,6 +1387,16 @@
       themeIcon.innerHTML = dark
         ? '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>'
         : '<path d="M12 3a9 9 0 1 0 9 9c0-.5 0-.9-.1-1.4A7 7 0 0 1 12 3Z"></path>';
+      // 다크모드 전환 시 mermaid 테마도 갱신하고 현재 노트를 다시 렌더링한다.
+      if (window.mermaid) {
+        window.mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: "strict",
+          theme: dark ? "dark" : "default",
+          fontFamily: "Inter, Pretendard, -apple-system, sans-serif"
+        });
+        if (currentFile) loadNote(currentFile).catch(showError);
+      }
     }
 
     noteNav.addEventListener("click", event => {
